@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,11 +14,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Endpoint } from "./EndpointCard";
+import { X } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   url: z.string().url("Must be a valid URL including http:// or https://"),
   checkInterval: z.coerce.number().int().min(1, "Must be at least 1 minute"),
+  emailRecipients: z.array(z.string().email("Must be a valid email address")),
   notifications: z.boolean().default(true),
 });
 
@@ -38,6 +39,7 @@ const EndpointForm = ({ endpoint, onSubmit, isSubmitting }: EndpointFormProps) =
     name: endpoint?.name || "",
     url: endpoint?.url || "",
     checkInterval: 5,
+    emailRecipients: [],
     notifications: endpoint?.notifications ?? true,
   };
 
@@ -45,6 +47,23 @@ const EndpointForm = ({ endpoint, onSubmit, isSubmitting }: EndpointFormProps) =
     resolver: zodResolver(formSchema),
     defaultValues,
   });
+
+  const emailRecipients = form.watch("emailRecipients") || [];
+
+  const addEmailRecipient = () => {
+    const emailField = document.getElementById("email-input") as HTMLInputElement;
+    const email = emailField.value.trim();
+    
+    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      form.setValue("emailRecipients", [...emailRecipients, email]);
+      emailField.value = "";
+    }
+  };
+
+  const removeEmailRecipient = (index: number) => {
+    const newRecipients = emailRecipients.filter((_, i) => i !== index);
+    form.setValue("emailRecipients", newRecipients);
+  };
 
   return (
     <Form {...form}>
@@ -96,6 +115,53 @@ const EndpointForm = ({ endpoint, onSubmit, isSubmitting }: EndpointFormProps) =
                 How often to check this endpoint
               </FormDescription>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="emailRecipients"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email Recipients</FormLabel>
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    id="email-input"
+                    type="email"
+                    placeholder="Enter email address"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    onClick={addEmailRecipient}
+                  >
+                    Add
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {emailRecipients.map((email, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-sm"
+                    >
+                      <span>{email}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeEmailRecipient(index)}
+                        className="ml-1 text-muted-foreground hover:text-foreground"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <FormMessage />
+              </div>
+              <FormDescription>
+                Add email addresses that will receive notifications
+              </FormDescription>
             </FormItem>
           )}
         />

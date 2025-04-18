@@ -14,6 +14,7 @@ const AddEndpoint = () => {
     name: string;
     url: string;
     checkInterval: number;
+    emailRecipients: string[];
     notifications: boolean;
   }) => {
     setIsSubmitting(true);

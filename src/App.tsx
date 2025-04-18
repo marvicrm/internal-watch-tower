@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import AddEndpoint from "./pages/AddEndpoint";
 import EditEndpoint from "./pages/EditEndpoint";
+import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
 
@@ -25,6 +26,7 @@ const App = () => (
             <Route index element={<Dashboard />} />
             <Route path="add-endpoint" element={<AddEndpoint />} />
             <Route path="endpoint/:id" element={<EditEndpoint />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
